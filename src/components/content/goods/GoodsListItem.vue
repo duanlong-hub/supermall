@@ -1,6 +1,6 @@
 <template>
-  <div class="goods-item">
-    <img :src="goodsItem.show.img" alt="">
+  <div class="goods-item" @click="itemClick">
+    <img :src="goodsItem.show.img" alt="" @load="imageLoad">
     <div class="goods-info">
       <p>{{goodsItem.title}}</p>
       <span class="price">{{goodsItem.price}}</span>
@@ -19,24 +19,32 @@
           return {}
         }
       }
+    },
+    methods: {
+      imageLoad(){
+        this.$bus.$emit('itemImageLoad')
+      },
+      itemClick(){
+        this.$router.push('/details/'+this.goodsItem.iid)
+      }
     }
   }
 </script>
 
 <style scoped>
-  .goods-item{
+  .goods-item {
     padding-bottom: 40px;
     position: relative;
 
     width: 48%;
   }
 
-  .goods-item img{
+  .goods-item img {
     width: 100%;
     border-radius: 5px;
   }
 
-  .goods-info{
+  .goods-info {
     font-size: 12px;
     position: absolute;
     bottom: 5px;
@@ -46,19 +54,19 @@
     text-align: center;
   }
 
-  .goods-info p{
+  .goods-info p {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-bottom: 3px;
   }
 
-  .goods-info .price{
+  .goods-info .price {
     color: var(--color-high-text);
     margin-right: 20px;
   }
 
-  .goods-info .collect{
+  .goods-info .collect {
     position: relative;
   }
 
