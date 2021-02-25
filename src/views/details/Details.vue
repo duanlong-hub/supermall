@@ -11,7 +11,7 @@
       <goods-list ref="recommend" :goods="recommends"/>
     </scroll>
     <back-top @click.native="backTop" v-show="isShowBackTop"/>
-    <detail-bottom-bar/>
+    <detail-bottom-bar @addToCart="addToCart"/>
   </div>
 </template>
 
@@ -29,7 +29,7 @@
   import Scroll from "../../components/common/scroll/Scroll";
 
   import {getDetails, getRecommend, Goods, Shop, GoodsParam} from "../../network/details";
-  import {itemListenerMixin,backTopMixin} from "../../common/mixin";
+  import {itemListenerMixin, backTopMixin} from "../../common/mixin";
   import {debounce} from "../../common/utils";
 
   export default {
@@ -58,7 +58,7 @@
         recommends: [],
         themeTopYs: [],
         getThemeTopY: null,
-        currentIndex: 0
+        currentIndex: 0,
       }
     },
     created() {
@@ -85,7 +85,7 @@
     destroyed() {
       this.$bus.$off('itemImgLoad', this.itemImgListener)
     },
-    mixins: [itemListenerMixin,backTopMixin],
+    mixins: [itemListenerMixin, backTopMixin],
     methods: {
       getDetails(iid) {
         getDetails(iid).then(res => {
@@ -145,6 +145,20 @@
           //3.监听backTop
           this.listenShowBackTop(position)
         }
+      },
+      addToCart() {
+        //1.获取需要添加到购物车的信息
+        const product = {}
+        product.image = this.topImages[0]
+        product.title = this.goods.title
+        product.desc = this.goods.desc
+        product.price = this.goods.realPrice
+        product.iid = this.iid
+
+        //2.将商品添加到购物车
+        this.$store.dispatch('addCart', product).then(res => {
+          this.$toast.show(res)
+        })
       }
     }
   }
