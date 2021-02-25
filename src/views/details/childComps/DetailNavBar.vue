@@ -20,7 +20,7 @@
   import NavBAR from "../../../components/common/navbar/NavBar";
 
   export default {
-    name: "DetailsNavBar",
+    name: "DetailNavBar",
     components: {NavBAR},
     data() {
       return {
@@ -31,6 +31,7 @@
     methods: {
       itemClick(index) {
         this.currentIndex = index
+        this.$emit('titleClick',index)
       },
       backClick(){
         this.$router.back()

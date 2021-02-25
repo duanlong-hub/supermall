@@ -36,9 +36,9 @@
       }
     },
     watch:{
-		  detailsInfo(){
+		  detailInfo(){
 		    //获取图片的个数
-        this.imagesLength = this.detailsInfo().detailImage[0].list.length
+        this.imagesLength = this.detailInfo.detailImage[0].list.length
       }
     }
 	}

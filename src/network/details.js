@@ -2,11 +2,19 @@ import {request} from "./request";
 
 export function getDetails(iid) {
   return request({
-    url: 'detail',
+    url: '/detail',
     params: {
       iid
     }
   })
+}
+
+export function getRecommend() {
+  return request({
+    url:'/recommend',
+
+  })
+
 }
 
 export class Goods {

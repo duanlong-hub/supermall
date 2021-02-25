@@ -12,13 +12,13 @@
             @scroll="contentScroll"
             @pullingUp="loadMore">
 
-      <HomeSwiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
-      <HomeRecommendView :recommends="recommends"/>
-      <FeatureView/>
-      <TabControl :titles="['流行','新款','精选']" @tabClick="tabClick" ref="tabControl2"/>
-      <GoodsList :goods="showGoods"/>
+      <home-swiper :banners="banners" @swiperImageLoad="swiperImageLoad"/>
+      <home-recommend-view :recommends="recommends"/>
+      <feature-view/>
+      <tab-control :titles="['流行','新款','精选']" @tabClick="tabClick" ref="tabControl2"/>
+      <goods-list :goods="showGoods"/>
     </scroll>
-    <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <back-top @click.native="backTop" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -31,15 +31,13 @@
   import TabControl from "../../components/content/tabControl/TabControl";
   import GoodsList from "../../components/content/goods/GoodsList";
   import Scroll from "../../components/common/scroll/Scroll";
-  import BackTop from "../../components/content/backTop/BackTop";
 
   import {getHomeMultidata, getHomeGoods} from "../../network/home";
-  import {debounce} from "../../common/utils";
+  import {itemListenerMixin,backTopMixin} from "../../common/mixin";
 
   export default {
     name: "Home",
     components: {
-      BackTop,
       HomeSwiper,
       HomeRecommendView,
       FeatureView,
@@ -59,7 +57,6 @@
         },
         tabType: ['new', 'pop', 'sell'],
         currentTabIndex: 0,
-        isShowBackTop: false,
         tabOffSetTop: 0,
         isTabFixed: false,
         saveY: 0
@@ -76,6 +73,9 @@
     },
     deactivated() {
       this.saveY = this.$refs.scroll.getScrollY()
+
+      //取消全局事件监听
+      this.$bus.$off('itemImgLoad', this.itemImgListener)
     },
     created() {
       //1.请求多个数据
@@ -86,14 +86,7 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
-    mounted() {
-      //1.图片加载完成的事件监听
-      const refresh = debounce(this.$refs.scroll.refresh, 50)
-      this.$bus.$on('itemImageLoad', () => {
-        refresh()
-      })
-
-    },
+    mixins: [itemListenerMixin,backTopMixin],
     methods: {
       /**
        * 事件监听相关
@@ -103,12 +96,9 @@
         this.$refs.tabControl1.currentIndex = index
         this.$refs.tabControl2.currentIndex = index
       },
-      backClick() {
-        this.$refs.scroll.scrollTo(0, 0)
-      },
       contentScroll(position) {
         //1.判断BackTop是否显示
-        this.isShowBackTop = (-position.y) > 1000
+        this.listenShowBackTop(position)
 
         //2.决定tabControl是否吸顶(position: fixed)
         this.isTabFixed = (-position.y) > this.tabOffSetTop
